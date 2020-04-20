@@ -65,6 +65,9 @@
   UNSPECV_BLOCKAGE
   UNSPECV_FENCE
   UNSPECV_FENCE_I
+
+  UNSPECV_SSST
+  UNSPECV_SSLD
 ])
 
 (define_constants
@@ -2102,7 +2105,7 @@
 (define_insn "jump"
   [(set (pc)
 	(label_ref (match_operand 0 "" "")))]
-  ""
+  ""	
   "j\t%l0"
   [(set_attr "type"	"jump")
    (set_attr "mode"	"none")])
@@ -2158,6 +2161,20 @@
 ;;
 ;;  ....................
 ;;
+
+(define_insn "ssst"
+[(unspec_volatile [(const_int 0)] UNSPECV_SSST)]
+""
+{
+	return "ssst";
+})
+
+(define_insn "ssld"
+[(unspec_volatile [(const_int 1)] UNSPECV_SSLD)]
+""
+{
+	return "ssld";
+})
 
 (define_expand "prologue"
   [(const_int 1)]

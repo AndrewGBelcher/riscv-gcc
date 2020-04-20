@@ -3864,11 +3864,15 @@ riscv_expand_prologue (void)
   unsigned mask = frame->mask;
   rtx insn;
 
+  if(TARGET_SSTACK)
+		emit_insn(gen_ssst());
+
   if (flag_stack_usage_info)
     current_function_static_stack_size = size;
 
   if (cfun->machine->naked_p)
     return;
+
 
   /* When optimizing for size, call a subroutine to save the registers.  */
   if (riscv_use_save_libcall (frame))
@@ -3884,6 +3888,8 @@ riscv_expand_prologue (void)
       REG_NOTES (insn) = dwarf;
     }
 
+
+
   /* Save the registers.  */
   if ((frame->mask | frame->fmask) != 0)
     {
@@ -3898,6 +3904,8 @@ riscv_expand_prologue (void)
     }
 
   frame->mask = mask; /* Undo the above fib.  */
+
+
 
   /* Set up the frame pointer, if we're using one.  */
   if (frame_pointer_needed)
@@ -3980,6 +3988,8 @@ riscv_expand_epilogue (int style)
   bool need_barrier_p = (get_frame_size ()
 			 + cfun->machine->frame.arg_pointer_offset) != 0;
 
+
+
   if (cfun->machine->naked_p)
     {
       gcc_assert (style == NORMAL_RETURN);
@@ -3991,6 +4001,9 @@ riscv_expand_epilogue (int style)
 
   if ((style == NORMAL_RETURN) && riscv_can_use_return_insn ())
     {
+       if(TARGET_SSTACK)
+		emit_insn(gen_ssld());
+
       emit_jump_insn (gen_return ());
       return;
     }
@@ -4101,16 +4114,22 @@ riscv_expand_epilogue (int style)
       REG_NOTES (insn) = dwarf;
     }
 
+
   if (use_restore_libcall)
     {
+
       rtx dwarf = riscv_adjust_libcall_cfi_epilogue ();
       insn = emit_insn (gen_gpr_restore (GEN_INT (riscv_save_libcall_count (mask))));
       RTX_FRAME_RELATED_P (insn) = 1;
       REG_NOTES (insn) = dwarf;
 
+	  if(TARGET_SSTACK)
+	    emit_insn(gen_ssld());
+
       emit_jump_insn (gen_gpr_restore_return (ra));
       return;
     }
+
 
   /* Add in the __builtin_eh_return stack adjustment. */
   if ((style == EXCEPTION_RETURN) && crtl->calls_eh_return)
@@ -4124,15 +4143,29 @@ riscv_expand_epilogue (int style)
 
       gcc_assert (mode != UNKNOWN_MODE);
 
-      if (mode == MACHINE_MODE)
-	emit_jump_insn (gen_riscv_mret ());
-      else if (mode == SUPERVISOR_MODE)
-	emit_jump_insn (gen_riscv_sret ());
-      else
-	emit_jump_insn (gen_riscv_uret ());
-    }
+		if (mode == MACHINE_MODE)
+		{
+			emit_jump_insn (gen_riscv_mret ());
+		}
+		  else if (mode == SUPERVISOR_MODE)
+		{
+			emit_jump_insn (gen_riscv_sret ());
+		}  
+		else
+		{
+			emit_jump_insn (gen_riscv_uret ());
+		}
+	}
+
+
   else if (style != SIBCALL_RETURN)
+	{
+	
+	if(TARGET_SSTACK)
+		emit_insn(gen_ssld());
+
     emit_jump_insn (gen_simple_return_internal (ra));
+	}
 }
 
 /* Implement EPILOGUE_USES.  */

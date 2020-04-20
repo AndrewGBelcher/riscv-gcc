@@ -91,6 +91,10 @@ mcmodel=
 Target Report RejectNegative Joined Enum(code_model) Var(riscv_cmodel) Init(TARGET_DEFAULT_CMODEL)
 Specify the code model.
 
+; Alternative to enabling shadow stack opcode support
+msstack
+Target Report Mask(SSTACK)
+
 mstrict-align
 Target Report Mask(STRICT_ALIGN) Save
 Do not generate unaligned memory accesses.
@@ -127,6 +131,9 @@ Mask(DOUBLE_FLOAT)
 Mask(RVC)
 
 Mask(RVE)
+
+; Support for shadow stack opcodes via arch extensions
+Mask(SSTACK)
 
 mriscv-attribute
 Target Report Var(riscv_emit_attribute_p) Init(-1)

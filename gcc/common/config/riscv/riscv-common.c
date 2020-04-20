@@ -575,6 +575,11 @@ riscv_parse_arch_string (const char *isa, int *flags, location_t loc)
   if (subset_list->lookup ("c"))
     *flags |= MASK_RVC;
 
+  /* shadow stack extension support */
+  *flags &= ~MASK_SSTACK;
+  if (subset_list->lookup ("s"))
+    *flags |= MASK_SSTACK;
+
   if (current_subset_list)
     delete current_subset_list;
 

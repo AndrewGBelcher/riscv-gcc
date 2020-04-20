@@ -656,6 +656,8 @@ typedef struct {
 
 #define Pmode word_mode
 
+
+
 /* Give call MEMs SImode since it is the "most permissive" mode
    for both 32-bit and 64-bit targets.  */
 

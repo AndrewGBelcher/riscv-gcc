@@ -51,4 +51,5 @@ enum riscv_align_data {
   riscv_align_data_type_natural
 };
 
+
 #endif /* ! GCC_RISCV_OPTS_H */
